@@ -1,0 +1,1142 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "connections_office365_name": {
+            "defaultValue": "office365",
+            "type": "String"
+        },
+        "workflows_DueDiligence_name": {
+            "defaultValue": "DueDiligence",
+            "type": "String"
+        },
+        "workflows_VendorOnboarding_name": {
+            "defaultValue": "VendorOnboarding",
+            "type": "String"
+        },
+        "connections_sharepointonline_name": {
+            "defaultValue": "sharepointonline",
+            "type": "String"
+        },
+        "connections_conversionservice_name": {
+            "defaultValue": "conversionservice",
+            "type": "String"
+        },
+        "workflows_LA_Monitor_Incoming_Mail_name": {
+            "defaultValue": "LA-Monitor-Incoming-Mail",
+            "type": "String"
+        },
+        "storageAccounts_vendormanagementdata_name": {
+            "defaultValue": "vendormanagementdata",
+            "type": "String"
+        },
+        "M365_Service_Account": {
+            "defaultValue": "Your M365 Service Account",
+            "type": "string"
+        },
+        "SharePoint_Vendor_Management_Site": {
+              "defaultValue": "https://Yoursite.Sharepoint.com/sites/VMan",
+              "type": "string"
+        },
+        "Shared_Mailbox_Address": {
+                "defaultValue": "vendorManagement@Yoursite.com",
+                "type": "string"
+              }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2023-04-01",
+            "name": "[parameters('storageAccounts_vendormanagementdata_name')]",
+            "location": "eastus",
+            "sku": {
+                "name": "Standard_LRS",
+                "tier": "Standard"
+            },
+            "kind": "StorageV2",
+            "properties": {
+                "dnsEndpointType": "Standard",
+                "defaultToOAuthAuthentication": false,
+                "publicNetworkAccess": "Enabled",
+                "allowCrossTenantReplication": false,
+                "minimumTlsVersion": "TLS1_2",
+                "allowBlobPublicAccess": false,
+                "allowSharedKeyAccess": true,
+                "networkAcls": {
+                    "bypass": "AzureServices",
+                    "virtualNetworkRules": [],
+                    "ipRules": [],
+                    "defaultAction": "Allow"
+                },
+                "supportsHttpsTrafficOnly": true,
+                "encryption": {
+                    "requireInfrastructureEncryption": false,
+                    "services": {
+                        "file": {
+                            "keyType": "Account",
+                            "enabled": true
+                        },
+                        "blob": {
+                            "keyType": "Account",
+                            "enabled": true
+                        }
+                    },
+                    "keySource": "Microsoft.Storage"
+                },
+                "accessTier": "Hot"
+            }
+        },
+        {
+            "type": "Microsoft.Web/connections",
+            "apiVersion": "2016-06-01",
+            "name": "[parameters('connections_conversionservice_name')]",
+            "location": "westeurope",
+            "kind": "V1",
+            "properties": {
+                "displayName": "Content Conversion",
+                "statuses": [
+                    {
+                        "status": "Connected"
+                    }
+                ],
+                "customParameterValues": {},
+                "nonSecretParameterValues": {},
+                "createdTime": "2024-05-09T12:03:31.290669Z",
+                "changedTime": "2024-05-09T12:03:31.290669Z",
+                "api": {
+                    "name": "[parameters('connections_conversionservice_name')]",
+                    "displayName": "Content Conversion",
+                    "description": "A service that allows content to be converted from one format to another.",
+                    "iconUri": "[concat('https://connectoricons-prod.azureedge.net/releases/v1.0.1686/1.0.1686.3706/', parameters('connections_conversionservice_name'), '/icon.png')]",
+                    "brandColor": "#4f6bed",
+                    "id": "[concat('/subscriptions/1e34af81-2008-4e1f-8354-80d8926a0ed6/providers/Microsoft.Web/locations/westeurope/managedApis/', parameters('connections_conversionservice_name'))]",
+                    "type": "Microsoft.Web/locations/managedApis"
+                },
+                "testLinks": []
+            }
+        },
+        {
+            "type": "Microsoft.Web/connections",
+            "apiVersion": "2016-06-01",
+            "name": "[parameters('connections_office365_name')]",
+            "location": "westeurope",
+            "kind": "V1",
+            "properties": {
+                "displayName": "[parameters('M365_Service_Account')]",
+                "statuses": [
+                    {
+                        "status": "Connected"
+                    }
+                ],
+                "customParameterValues": {},
+                "nonSecretParameterValues": {},
+                "createdTime": "2024-05-09T07:49:03.1914592Z",
+                "changedTime": "2024-05-22T06:55:52.072693Z",
+                "api": {
+                    "name": "[parameters('connections_office365_name')]",
+                    "displayName": "Office 365 Outlook",
+                    "description": "Microsoft Office 365 is a cloud-based service that is designed to help meet your organization's needs for robust security, reliability, and user productivity.",
+                    "iconUri": "[concat('https://connectoricons-prod.azureedge.net/releases/v1.0.1677/1.0.1677.3637/', parameters('connections_office365_name'), '/icon.png')]",
+                    "brandColor": "#0078D4",
+                    "id": "[concat('/subscriptions/1e34af81-2008-4e1f-8354-80d8926a0ed6/providers/Microsoft.Web/locations/westeurope/managedApis/', parameters('connections_office365_name'))]",
+                    "type": "Microsoft.Web/locations/managedApis"
+                },
+                "testLinks": [
+                    {
+                        "requestUri": "[concat('https://management.azure.com:443/subscriptions/1e34af81-2008-4e1f-8354-80d8926a0ed6/resourceGroups/VendorManagement/providers/Microsoft.Web/connections/', parameters('connections_office365_name'), '/extensions/proxy/testconnection?api-version=2016-06-01')]",
+                        "method": "get"
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Web/connections",
+            "apiVersion": "2016-06-01",
+            "name": "[parameters('connections_sharepointonline_name')]",
+            "location": "westeurope",
+            "kind": "V1",
+            "properties": {
+                "displayName": "[parameters('M365_Service_Account')]",
+                "statuses": [
+                    {
+                        "status": "Connected"
+                    }
+                ],
+                "customParameterValues": {},
+                "nonSecretParameterValues": {},
+                "createdTime": "2024-05-09T08:12:35.580799Z",
+                "changedTime": "2024-05-22T07:04:47.8432438Z",
+                "api": {
+                    "name": "[parameters('connections_sharepointonline_name')]",
+                    "displayName": "SharePoint",
+                    "description": "SharePoint helps organizations share and collaborate with colleagues, partners, and customers. You can connect to SharePoint Online or to an on-premises SharePoint 2016 or 2019 farm using the On-Premises Data Gateway to manage documents and list items.",
+                    "iconUri": "[concat('https://connectoricons-prod.azureedge.net/releases/v1.0.1685/1.0.1685.3700/', parameters('connections_sharepointonline_name'), '/icon.png')]",
+                    "brandColor": "#036C70",
+                    "id": "[concat('/subscriptions/1e34af81-2008-4e1f-8354-80d8926a0ed6/providers/Microsoft.Web/locations/westeurope/managedApis/', parameters('connections_sharepointonline_name'))]",
+                    "type": "Microsoft.Web/locations/managedApis"
+                },
+                "testLinks": []
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/blobServices",
+            "apiVersion": "2023-04-01",
+            "name": "[concat(parameters('storageAccounts_vendormanagementdata_name'), '/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_vendormanagementdata_name'))]"
+            ],
+            "sku": {
+                "name": "Standard_LRS",
+                "tier": "Standard"
+            },
+            "properties": {
+                "cors": {
+                    "corsRules": []
+                },
+                "deleteRetentionPolicy": {
+                    "allowPermanentDelete": false,
+                    "enabled": true,
+                    "days": 7
+                },
+                "containerDeleteRetentionPolicy": {
+                    "enabled": true,
+                    "days": 7
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/fileServices",
+            "apiVersion": "2023-04-01",
+            "name": "[concat(parameters('storageAccounts_vendormanagementdata_name'), '/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_vendormanagementdata_name'))]"
+            ],
+            "sku": {
+                "name": "Standard_LRS",
+                "tier": "Standard"
+            },
+            "properties": {
+                "protocolSettings": {
+                    "smb": {}
+                },
+                "cors": {
+                    "corsRules": []
+                },
+                "shareDeleteRetentionPolicy": {
+                    "enabled": true,
+                    "days": 7
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/queueServices",
+            "apiVersion": "2023-04-01",
+            "name": "[concat(parameters('storageAccounts_vendormanagementdata_name'), '/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_vendormanagementdata_name'))]"
+            ],
+            "properties": {
+                "cors": {
+                    "corsRules": []
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/tableServices",
+            "apiVersion": "2023-04-01",
+            "name": "[concat(parameters('storageAccounts_vendormanagementdata_name'), '/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_vendormanagementdata_name'))]"
+            ],
+            "properties": {
+                "cors": {
+                    "corsRules": []
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Logic/workflows",
+            "apiVersion": "2017-07-01",
+            "name": "[parameters('workflows_DueDiligence_name')]",
+            "location": "westeurope",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/connections', parameters('connections_sharepointonline_name'))]",
+                "[resourceId('Microsoft.Web/connections', parameters('connections_office365_name'))]"
+            ],
+            "properties": {
+                "state": "Enabled",
+                "definition": {
+                    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {
+                        "$connections": {
+                            "defaultValue": {},
+                            "type": "Object"
+                        }
+                    },
+                    "triggers": {
+                        "When_a_HTTP_request_is_received": {
+                            "type": "Request",
+                            "kind": "Http",
+                            "inputs": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "CompanyID": {
+                                            "type": "integer"
+                                        },
+                                        "Framework": {
+                                            "type": "string"
+                                        },
+                                        "DueDiligenceID": {
+                                            "type": "integer"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "actions": {
+                        "Get_Due_Diligence_Items": {
+                            "runAfter": {
+                                "Get_Compliance_Framework": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ApiConnection",
+                            "inputs": {
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['sharepointonline']['connectionId']"
+                                    }
+                                },
+                                "method": "get",
+                                "path": "/datasets/@{encodeURIComponent(encodeURIComponent('[parameters('SharePoint_Vendor_Management_Site')]'))}/tables/@{encodeURIComponent(encodeURIComponent('ad9e3661-ee9d-4863-b476-03de24ff3744'))}/items",
+                                "queries": {
+                                    "$filter": "ComplianceFramework eq '@{body('Get_Compliance_Framework')?['Title']}'"
+                                }
+                            }
+                        },
+                        "Table_all_Requirements": {
+                            "runAfter": {
+                                "Get_Due_Diligence_Items": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "Select",
+                            "inputs": {
+                                "from": "@body('Get_Due_Diligence_Items')?['value']",
+                                "select": {
+                                    "Requirement": "@item()?['Title']",
+                                    "Description": "@item()?['Requirement']"
+                                }
+                            }
+                        },
+                        "Get_Company_Details": {
+                            "runAfter": {
+                                "Response": [
+                                    "Succeeded",
+                                    "Skipped"
+                                ]
+                            },
+                            "type": "ApiConnection",
+                            "inputs": {
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['sharepointonline']['connectionId']"
+                                    }
+                                },
+                                "method": "get",
+                                "path": "/datasets/@{encodeURIComponent(encodeURIComponent('[parameters('SharePoint_Vendor_Management_Site')]'))}/tables/@{encodeURIComponent(encodeURIComponent('0d7b99f7-6f5a-4c5b-b366-755db787d50c'))}/items/@{encodeURIComponent(triggerBody()?['CompanyID'])}"
+                            }
+                        },
+                        "Create_HTML_table": {
+                            "runAfter": {
+                                "Table_all_Requirements": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "Table",
+                            "inputs": {
+                                "from": "@body('Table_all_Requirements')",
+                                "format": "HTML"
+                            }
+                        },
+                        "Get_Compliance_Framework": {
+                            "runAfter": {
+                                "Get_Company_Details": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ApiConnection",
+                            "inputs": {
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['sharepointonline']['connectionId']"
+                                    }
+                                },
+                                "method": "get",
+                                "path": "/datasets/@{encodeURIComponent(encodeURIComponent('[parameters('SharePoint_Vendor_Management_Site')]'))}/tables/@{encodeURIComponent(encodeURIComponent('65e8afa7-8e9c-4bd4-9c4a-18aa036f04bf'))}/items/@{encodeURIComponent(int(triggerBody()?['Framework']))}"
+                            }
+                        },
+                        "Send_an_email_from_a_shared_mailbox_(V2)": {
+                            "runAfter": {
+                                "Create_HTML_table": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ApiConnection",
+                            "inputs": {
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['office365']['connectionId']"
+                                    }
+                                },
+                                "method": "post",
+                                "body": {
+                                    "MailboxAddress": "[parameters('Shared_Mailbox_Address')]",
+                                    "To": "@{json(body('Get_Company_Details')?['AllFormContent'])?['Email']}",
+                                    "Subject": "[concat('Vendor Onboarding - VMRE@{triggerBody()?[''CompanyID'']}-@{triggerBody()?[''', parameters('workflows_DueDiligence_name'), 'ID'']}## - Please do not edit subject')]",
+                                    "Body": "<p><b><strong style=\"font-size: 17px;\">Vendor Onboarding</strong></b></p><p>Thank you for your interest in onboarding with XXX</p><br><p>In compliance with @{body('Get_Compliance_Framework')?['Title']} we require information on the following:<span>\n</span>@{body('Create_HTML_table')}</p><br><p>Please respond to this email with your attachments. Please do not edit the subject line.</p>",
+                                    "Importance": "Normal"
+                                },
+                                "path": "/v2/SharedMailbox/Mail"
+                            }
+                        },
+                        "Response": {
+                            "runAfter": {},
+                            "type": "Response",
+                            "kind": "Http",
+                            "inputs": {
+                                "statusCode": 200
+                            }
+                        }
+                    },
+                    "outputs": {}
+                },
+                "parameters": {
+                    "$connections": {
+                        "value": {
+                            "sharepointonline": {
+                                "id": "/subscriptions/1e34af81-2008-4e1f-8354-80d8926a0ed6/providers/Microsoft.Web/locations/westeurope/managedApis/sharepointonline",
+                                "connectionId": "[resourceId('Microsoft.Web/connections', parameters('connections_sharepointonline_name'))]",
+                                "connectionName": "sharepointonline"
+                            },
+                            "office365": {
+                                "id": "/subscriptions/1e34af81-2008-4e1f-8354-80d8926a0ed6/providers/Microsoft.Web/locations/westeurope/managedApis/office365",
+                                "connectionId": "[resourceId('Microsoft.Web/connections', parameters('connections_office365_name'))]",
+                                "connectionName": "office365"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+            "apiVersion": "2023-04-01",
+            "name": "[concat(parameters('storageAccounts_vendormanagementdata_name'), '/default/vmdata')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccounts_vendormanagementdata_name'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_vendormanagementdata_name'))]"
+            ],
+            "properties": {
+                "immutableStorageWithVersioning": {
+                    "enabled": false
+                },
+                "defaultEncryptionScope": "$account-encryption-key",
+                "denyEncryptionScopeOverride": false,
+                "publicAccess": "None"
+            }
+        },
+        {
+            "type": "Microsoft.Logic/workflows",
+            "apiVersion": "2017-07-01",
+            "name": "[parameters('workflows_LA_Monitor_Incoming_Mail_name')]",
+            "location": "westeurope",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/connections', parameters('connections_office365_name'))]",
+                "[resourceId('Microsoft.Web/connections', parameters('connections_sharepointonline_name'))]",
+                "[resourceId('Microsoft.Web/connections', parameters('connections_conversionservice_name'))]"
+            ],
+            "properties": {
+                "state": "Enabled",
+                "definition": {
+                    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {
+                        "$connections": {
+                            "defaultValue": {},
+                            "type": "Object"
+                        }
+                    },
+                    "triggers": {
+                        "When_a_new_email_arrives_in_a_shared_mailbox_(V2)": {
+                            "recurrence": {
+                                "interval": 3,
+                                "frequency": "Minute"
+                            },
+                            "evaluatedRecurrence": {
+                                "interval": 3,
+                                "frequency": "Minute"
+                            },
+                            "splitOn": "@triggerBody()?['value']",
+                            "type": "ApiConnection",
+                            "inputs": {
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['office365']['connectionId']"
+                                    }
+                                },
+                                "method": "get",
+                                "path": "/v2/SharedMailbox/Mail/OnNewEmail",
+                                "queries": {
+                                    "mailboxAddress": "[parameters('Shared_Mailbox_Address')]",
+                                    "importance": "Any",
+                                    "hasAttachments": false,
+                                    "includeAttachments": true,
+                                    "folderId": "Inbox"
+                                },
+                                "retryPolicy": {
+                                    "type": "none"
+                                }
+                            }
+                        }
+                    },
+                    "actions": {
+                        "Is_this_attached_to_an_Existing_Ticket_or_something_new": {
+                            "actions": {
+                                "Set_CompanyID": {
+                                    "type": "SetVariable",
+                                    "inputs": {
+                                        "name": "CompanyID",
+                                        "value": "@int(first(split(last(split(first(split(triggerBody()?['subject'], '##')), 'VMRE')),'-')))"
+                                    }
+                                },
+                                "Set_TaskID": {
+                                    "runAfter": {
+                                        "Set_CompanyID": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "SetVariable",
+                                    "inputs": {
+                                        "name": "TaskID",
+                                        "value": "@if(empty(string(last(split(last(split(first(split(triggerBody()?['subject'], '##')), 'VMRE')),'-')))),0,int(last(split(last(split(first(split(triggerBody()?['subject'], '##')), 'VMRE')),'-'))))"
+                                    }
+                                },
+                                "Condition_is_Ticket_or_Task": {
+                                    "actions": {
+                                        "Set_Assigned_to_Company": {
+                                            "type": "SetVariable",
+                                            "inputs": {
+                                                "name": "Assigned To",
+                                                "value": "@body('Get_Company')?['PSGDivManager']?['Email']"
+                                            }
+                                        }
+                                    },
+                                    "runAfter": {
+                                        "Get_Company": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "else": {
+                                        "actions": {
+                                            "Get_Task": {
+                                                "type": "ApiConnection",
+                                                "inputs": {
+                                                    "host": {
+                                                        "connection": {
+                                                            "name": "@parameters('$connections')['sharepointonline']['connectionId']"
+                                                        }
+                                                    },
+                                                    "method": "get",
+                                                    "path": "/datasets/@{encodeURIComponent(encodeURIComponent('[parameters('SharePoint_Vendor_Management_Site')]'))}/tables/@{encodeURIComponent(encodeURIComponent('27f04651-dcf2-42d3-b38e-446f623d50e0'))}/items/@{encodeURIComponent(variables('TaskID'))}"
+                                                }
+                                            },
+                                            "Set_Assigned_to_To_Task": {
+                                                "runAfter": {
+                                                    "Get_Task": [
+                                                        "Succeeded"
+                                                    ]
+                                                },
+                                                "type": "SetVariable",
+                                                "inputs": {
+                                                    "name": "Assigned To",
+                                                    "value": "@body('Get_Task')?['AssignedTo']?['Email']"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "expression": {
+                                        "and": [
+                                            {
+                                                "greater": [
+                                                    "@variables('TaskID')",
+                                                    0
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    "type": "If"
+                                },
+                                "Send_an_email_from_a_shared_mailbox_(V2)": {
+                                    "runAfter": {
+                                        "Condition_is_Ticket_or_Task": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "ApiConnection",
+                                    "inputs": {
+                                        "host": {
+                                            "connection": {
+                                                "name": "@parameters('$connections')['office365']['connectionId']"
+                                            }
+                                        },
+                                        "method": "post",
+                                        "body": {
+                                            "MailboxAddress": "[parameters('Shared_Mailbox_Address')]",
+                                            "To": "@variables('Assigned To')",
+                                            "Subject": "@{body('Get_Company')['Title']} - New Attachment Provided",
+                                            "Body": "<p>Please note that @{body('Get_Company')['Title']} has had a document update from the customer.</p><br><p>Please see the <a href=\"[parameters('SharePoint_Vendor_Management_Site')]?CID=@{body('Get_Company')?['ID']}@{if(greater(variables('TaskID'),0),concat('&TID=',variables('TaskID')),'')}\">Vendor Management Solution</a></p>"
+                                        },
+                                        "path": "/v2/SharedMailbox/Mail"
+                                    }
+                                },
+                                "Get_Company": {
+                                    "runAfter": {
+                                        "For_each_2": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "ApiConnection",
+                                    "inputs": {
+                                        "host": {
+                                            "connection": {
+                                                "name": "@parameters('$connections')['sharepointonline']['connectionId']"
+                                            }
+                                        },
+                                        "method": "get",
+                                        "path": "/datasets/@{encodeURIComponent(encodeURIComponent('[parameters('SharePoint_Vendor_Management_Site')]'))}/tables/@{encodeURIComponent(encodeURIComponent('0d7b99f7-6f5a-4c5b-b366-755db787d50c'))}/items/@{encodeURIComponent(variables('CompanyID'))}"
+                                    }
+                                },
+                                "Create_Email_Attachment": {
+                                    "runAfter": {
+                                        "Set_TaskID": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "ApiConnection",
+                                    "inputs": {
+                                        "host": {
+                                            "connection": {
+                                                "name": "@parameters('$connections')['sharepointonline']['connectionId']"
+                                            }
+                                        },
+                                        "method": "post",
+                                        "body": "@body('Html_to_text')",
+                                        "path": "/datasets/@{encodeURIComponent(encodeURIComponent('[parameters('SharePoint_Vendor_Management_Site')]'))}/files",
+                                        "queries": {
+                                            "folderPath": "/Shared Documents/@{variables('CompanyID')}",
+                                            "name": "@{formatDateTime(utcNow(),'yyyy-MM-dd hh:mm')}_Email.eml",
+                                            "queryParametersSingleEncoded": true
+                                        }
+                                    },
+                                    "runtimeConfiguration": {
+                                        "contentTransfer": {
+                                            "transferMode": "Chunked"
+                                        }
+                                    }
+                                },
+                                "For_each_2": {
+                                    "foreach": "@triggerBody()?['attachments']",
+                                    "actions": {
+                                        "Upload_Attachment": {
+                                            "type": "ApiConnection",
+                                            "inputs": {
+                                                "host": {
+                                                    "connection": {
+                                                        "name": "@parameters('$connections')['sharepointonline']['connectionId']"
+                                                    }
+                                                },
+                                                "method": "post",
+                                                "body": "@base64ToBinary(item()?['contentBytes'])",
+                                                "path": "/datasets/@{encodeURIComponent(encodeURIComponent('[parameters('SharePoint_Vendor_Management_Site')]'))}/files",
+                                                "queries": {
+                                                    "folderPath": "/Shared Documents/@{variables('CompanyID')}",
+                                                    "name": "@item()?['name']",
+                                                    "queryParametersSingleEncoded": true
+                                                }
+                                            },
+                                            "runtimeConfiguration": {
+                                                "contentTransfer": {
+                                                    "transferMode": "Chunked"
+                                                }
+                                            }
+                                        },
+                                        "Update_file_properties": {
+                                            "runAfter": {
+                                                "Upload_Attachment": [
+                                                    "Succeeded"
+                                                ]
+                                            },
+                                            "type": "ApiConnection",
+                                            "inputs": {
+                                                "host": {
+                                                    "connection": {
+                                                        "name": "@parameters('$connections')['sharepointonline']['connectionId']"
+                                                    }
+                                                },
+                                                "method": "patch",
+                                                "body": {
+                                                    "CompanyID": "@{variables('CompanyID')}",
+                                                    "TaskID": "@{variables('TaskID')}"
+                                                },
+                                                "path": "/datasets/@{encodeURIComponent(encodeURIComponent('[parameters('SharePoint_Vendor_Management_Site')]'))}/tables/@{encodeURIComponent(encodeURIComponent('042b4756-6b8f-4a4a-8da7-62b6c9e89745'))}/items/@{encodeURIComponent(body('Upload_Attachment')?['ItemId'])}/patchfileitem"
+                                            }
+                                        }
+                                    },
+                                    "runAfter": {
+                                        "Create_Email_Attachment": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "Foreach"
+                                }
+                            },
+                            "runAfter": {
+                                "Initialize_Assigned_To": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "else": {
+                                "actions": {
+                                    "Create_Unallocated_item": {
+                                        "type": "ApiConnection",
+                                        "inputs": {
+                                            "host": {
+                                                "connection": {
+                                                    "name": "@parameters('$connections')['sharepointonline']['connectionId']"
+                                                }
+                                            },
+                                            "method": "post",
+                                            "body": {
+                                                "Title": "@triggerBody()?['subject']",
+                                                "From": "@triggerBody()?['from']",
+                                                "EmailContent": "<p>@{body('Html_to_text')}</p>"
+                                            },
+                                            "path": "/datasets/@{encodeURIComponent(encodeURIComponent('[parameters('SharePoint_Vendor_Management_Site')]'))}/tables/@{encodeURIComponent(encodeURIComponent('2e16c9ca-8af4-4f0b-81c6-237a32f5c9fa'))}/items"
+                                        }
+                                    },
+                                    "Add_Email_as_attachment": {
+                                        "runAfter": {
+                                            "Create_Unallocated_item": [
+                                                "Succeeded"
+                                            ]
+                                        },
+                                        "type": "ApiConnection",
+                                        "inputs": {
+                                            "host": {
+                                                "connection": {
+                                                    "name": "@parameters('$connections')['sharepointonline']['connectionId']"
+                                                }
+                                            },
+                                            "method": "post",
+                                            "body": "@body('Html_to_text')",
+                                            "path": "/datasets/@{encodeURIComponent(encodeURIComponent('[parameters('SharePoint_Vendor_Management_Site')]'))}/tables/@{encodeURIComponent(encodeURIComponent('2e16c9ca-8af4-4f0b-81c6-237a32f5c9fa'))}/items/@{encodeURIComponent(encodeURIComponent(body('Create_Unallocated_item')?['ID']))}/attachments",
+                                            "queries": {
+                                                "displayName": "OriginalMail.eml"
+                                            }
+                                        }
+                                    },
+                                    "For_each": {
+                                        "foreach": "@triggerBody()?['attachments']",
+                                        "actions": {
+                                            "Add_attachment": {
+                                                "type": "ApiConnection",
+                                                "inputs": {
+                                                    "host": {
+                                                        "connection": {
+                                                            "name": "@parameters('$connections')['sharepointonline']['connectionId']"
+                                                        }
+                                                    },
+                                                    "method": "post",
+                                                    "body": "@base64ToBinary(item()?['contentBytes'])",
+                                                    "path": "/datasets/@{encodeURIComponent(encodeURIComponent('[parameters('SharePoint_Vendor_Management_Site')]'))}/tables/@{encodeURIComponent(encodeURIComponent('2e16c9ca-8af4-4f0b-81c6-237a32f5c9fa'))}/items/@{encodeURIComponent(encodeURIComponent(body('Create_Unallocated_item')?['ID']))}/attachments",
+                                                    "queries": {
+                                                        "displayName": "@item()?['name']"
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        "runAfter": {
+                                            "Add_Email_as_attachment": [
+                                                "Succeeded"
+                                            ]
+                                        },
+                                        "type": "Foreach",
+                                        "runtimeConfiguration": {
+                                            "concurrency": {
+                                                "repetitions": 1
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            "expression": {
+                                "and": [
+                                    {
+                                        "contains": [
+                                            "@triggerBody()?['subject']",
+                                            "VMRE"
+                                        ]
+                                    },
+                                    {
+                                        "contains": [
+                                            "@triggerBody()?['subject']",
+                                            "##"
+                                        ]
+                                    }
+                                ]
+                            },
+                            "type": "If"
+                        },
+                        "Html_to_text": {
+                            "runAfter": {},
+                            "type": "ApiConnection",
+                            "inputs": {
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['conversionservice']['connectionId']"
+                                    }
+                                },
+                                "method": "post",
+                                "body": "<p>@{triggerBody()?['body']}</p>",
+                                "path": "/html2text"
+                            }
+                        },
+                        "Initialize_CompanyID": {
+                            "runAfter": {
+                                "Html_to_text": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "InitializeVariable",
+                            "inputs": {
+                                "variables": [
+                                    {
+                                        "name": "CompanyID",
+                                        "type": "integer",
+                                        "value": 0
+                                    }
+                                ]
+                            }
+                        },
+                        "Initialize_TaskID": {
+                            "runAfter": {
+                                "Initialize_CompanyID": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "InitializeVariable",
+                            "inputs": {
+                                "variables": [
+                                    {
+                                        "name": "TaskID",
+                                        "type": "integer",
+                                        "value": 0
+                                    }
+                                ]
+                            }
+                        },
+                        "Initialize_RedirectURL": {
+                            "runAfter": {
+                                "Initialize_TaskID": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "InitializeVariable",
+                            "inputs": {
+                                "variables": [
+                                    {
+                                        "name": "RedirectURL",
+                                        "type": "string"
+                                    }
+                                ]
+                            }
+                        },
+                        "Initialize_Assigned_To": {
+                            "runAfter": {
+                                "Initialize_RedirectURL": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "InitializeVariable",
+                            "inputs": {
+                                "variables": [
+                                    {
+                                        "name": "Assigned To",
+                                        "type": "string"
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    "outputs": {}
+                },
+                "parameters": {
+                    "$connections": {
+                        "value": {
+                            "office365": {
+                                "id": "/subscriptions/1e34af81-2008-4e1f-8354-80d8926a0ed6/providers/Microsoft.Web/locations/westeurope/managedApis/office365",
+                                "connectionId": "[resourceId('Microsoft.Web/connections', parameters('connections_office365_name'))]",
+                                "connectionName": "office365"
+                            },
+                            "sharepointonline": {
+                                "id": "/subscriptions/1e34af81-2008-4e1f-8354-80d8926a0ed6/providers/Microsoft.Web/locations/westeurope/managedApis/sharepointonline",
+                                "connectionId": "[resourceId('Microsoft.Web/connections', parameters('connections_sharepointonline_name'))]",
+                                "connectionName": "sharepointonline"
+                            },
+                            "conversionservice": {
+                                "id": "/subscriptions/1e34af81-2008-4e1f-8354-80d8926a0ed6/providers/Microsoft.Web/locations/westeurope/managedApis/conversionservice",
+                                "connectionId": "[resourceId('Microsoft.Web/connections', parameters('connections_conversionservice_name'))]",
+                                "connectionName": "conversionservice"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Logic/workflows",
+            "apiVersion": "2017-07-01",
+            "name": "[parameters('workflows_VendorOnboarding_name')]",
+            "location": "westeurope",
+            "dependsOn": [
+                "[resourceId('Microsoft.Logic/workflows', parameters('workflows_DueDiligence_name'))]",
+                "[resourceId('Microsoft.Web/connections', parameters('connections_sharepointonline_name'))]",
+                "[resourceId('Microsoft.Web/connections', parameters('connections_office365_name'))]"
+            ],
+            "properties": {
+                "state": "Enabled",
+                "definition": {
+                    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {
+                        "$connections": {
+                            "defaultValue": {},
+                            "type": "Object"
+                        }
+                    },
+                    "triggers": {
+                        "When_an_item_is_created_in_Companies": {
+                            "recurrence": {
+                                "interval": 3,
+                                "frequency": "Minute"
+                            },
+                            "evaluatedRecurrence": {
+                                "interval": 3,
+                                "frequency": "Minute"
+                            },
+                            "splitOn": "@triggerBody()?['value']",
+                            "type": "ApiConnection",
+                            "inputs": {
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['sharepointonline']['connectionId']"
+                                    }
+                                },
+                                "method": "get",
+                                "path": "/datasets/@{encodeURIComponent(encodeURIComponent('[parameters('SharePoint_Vendor_Management_Site')]'))}/tables/@{encodeURIComponent(encodeURIComponent('0d7b99f7-6f5a-4c5b-b366-755db787d50c'))}/onnewitems"
+                            }
+                        }
+                    },
+                    "actions": {
+                        "Create_Due_Diligence_Task": {
+                            "runAfter": {
+                                "Has_Configuration_been_completed": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ApiConnection",
+                            "inputs": {
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['sharepointonline']['connectionId']"
+                                    }
+                                },
+                                "method": "post",
+                                "body": {
+                                    "Title": "Vendor Onboarding Due Diligence - @{triggerBody()?['Title']}",
+                                    "CompanyID": "@{triggerBody()?['ID']}",
+                                    "Status": "In Progress"
+                                },
+                                "path": "/datasets/@{encodeURIComponent(encodeURIComponent('[parameters('SharePoint_Vendor_Management_Site')]'))}/tables/@{encodeURIComponent(encodeURIComponent('953f7e00-5f7e-4e45-93a3-60d74faff55b'))}/items"
+                            }
+                        },
+                        "Send_an_email_from_a_shared_mailbox_(V2)": {
+                            "runAfter": {},
+                            "type": "ApiConnection",
+                            "inputs": {
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['office365']['connectionId']"
+                                    }
+                                },
+                                "method": "post",
+                                "body": {
+                                    "MailboxAddress": "[parameters('Shared_Mailbox_Address')]",
+                                    "To": "@{triggerBody()?['Owner']?['Email']};@{triggerBody()?['Overseer']?['Email']}",
+                                    "Subject": "New Vendor Captured - @{triggerBody()?['Title']}",
+                                    "Body": "<p><b><strong style=\"font-size: 17px;\">New Vendor</strong></b></p><p>Please note a new vendor has been captured in Vendtrax.</p><br><p>Title: @{triggerBody()?['Title']}</p><p>VendorCode: @{triggerBody()?['VendorCode']}</p><p>Category Of Service: @{triggerBody()?['CategoryOfService']}</p><p>Owner: @{triggerBody()?['Owner']?['Email']}</p><p>Overseer: @{triggerBody()?['Overseer']?['Email']}<br><br><a href=\"@{concat(replace(first(split(triggerBody()?['{FullPath}'],'/lists/')),'/lists/',''),concat('CID=',triggerBody()?['ID']))}\">View Vendor</a></p>",
+                                    "Importance": "Normal"
+                                },
+                                "path": "/v2/SharedMailbox/Mail"
+                            }
+                        },
+                        "Update_item": {
+                            "runAfter": {
+                                "For_each_1": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ApiConnection",
+                            "inputs": {
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['sharepointonline']['connectionId']"
+                                    }
+                                },
+                                "method": "patch",
+                                "body": {
+                                    "Title": "@body('Create_Due_Diligence_Task')?['Title']",
+                                    "GTTicketStatus": {
+                                        "Value": "Onboarding Due Diligence"
+                                    }
+                                },
+                                "path": "/datasets/@{encodeURIComponent(encodeURIComponent('[parameters('SharePoint_Vendor_Management_Site')]'))}/tables/@{encodeURIComponent(encodeURIComponent('0d7b99f7-6f5a-4c5b-b366-755db787d50c'))}/items/@{encodeURIComponent(triggerBody()?['ID'])}"
+                            }
+                        },
+                        "Get_Company_Configuration_Data": {
+                            "runAfter": {},
+                            "type": "ApiConnection",
+                            "inputs": {
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['sharepointonline']['connectionId']"
+                                    }
+                                },
+                                "method": "get",
+                                "path": "/datasets/@{encodeURIComponent(encodeURIComponent('[parameters('SharePoint_Vendor_Management_Site')]'))}/tables/@{encodeURIComponent(encodeURIComponent('2896d58e-9802-4a0d-b09a-e96d0f7165c0'))}/items",
+                                "queries": {
+                                    "$filter": "Title eq 'VMConfiguration'",
+                                    "$top": 1
+                                }
+                            }
+                        },
+                        "Compliance_Frameworks": {
+                            "runAfter": {
+                                "Get_Company_Configuration_Data": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "InitializeVariable",
+                            "inputs": {
+                                "variables": [
+                                    {
+                                        "name": "Compliance Frameworks",
+                                        "type": "array",
+                                        "value": [
+                                            "DORA"
+                                        ]
+                                    }
+                                ]
+                            }
+                        },
+                        "Has_Configuration_been_completed": {
+                            "actions": {
+                                "For_each": {
+                                    "foreach": "@body('Get_Company_Configuration_Data')?['value']",
+                                    "actions": {
+                                        "Extract_the_Compliance_Frameworks": {
+                                            "type": "SetVariable",
+                                            "inputs": {
+                                                "name": "Compliance Frameworks",
+                                                "value": "@split(replace(json(item()?['ConfigData'])?['ComplianceFramework'],';#','|'),'|')"
+                                            }
+                                        }
+                                    },
+                                    "type": "Foreach"
+                                }
+                            },
+                            "runAfter": {
+                                "Compliance_Frameworks": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "else": {
+                                "actions": {}
+                            },
+                            "expression": {
+                                "and": [
+                                    {
+                                        "greater": [
+                                            "@length(body('Get_Company_Configuration_Data')?['value'])",
+                                            0
+                                        ]
+                                    }
+                                ]
+                            },
+                            "type": "If"
+                        },
+                        "For_each_1": {
+                            "foreach": "@variables('Compliance Frameworks')",
+                            "actions": {
+                                "DueDiligence": {
+                                    "type": "Workflow",
+                                    "inputs": {
+                                        "host": {
+                                            "workflow": {
+                                                "id": "[resourceId('Microsoft.Logic/workflows', parameters('workflows_DueDiligence_name'))]"
+                                            },
+                                            "triggerName": "When_a_HTTP_request_is_received"
+                                        },
+                                        "body": {
+                                            "CompanyID": "@triggerBody()?['ID']",
+                                            "Framework": "@{item()}",
+                                            "DueDiligenceID": "@body('Create_Due_Diligence_Task')?['ID']"
+                                        }
+                                    }
+                                }
+                            },
+                            "runAfter": {
+                                "Create_Due_Diligence_Task": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "Foreach"
+                        }
+                    },
+                    "outputs": {}
+                },
+                "parameters": {
+                    "$connections": {
+                        "value": {
+                            "sharepointonline": {
+                                "id": "/subscriptions/1e34af81-2008-4e1f-8354-80d8926a0ed6/providers/Microsoft.Web/locations/westeurope/managedApis/sharepointonline",
+                                "connectionId": "[resourceId('Microsoft.Web/connections', parameters('connections_sharepointonline_name'))]",
+                                "connectionName": "sharepointonline"
+                            },
+                            "office365": {
+                                "id": "/subscriptions/1e34af81-2008-4e1f-8354-80d8926a0ed6/providers/Microsoft.Web/locations/westeurope/managedApis/office365",
+                                "connectionId": "[resourceId('Microsoft.Web/connections', parameters('connections_office365_name'))]",
+                                "connectionName": "office365"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}
